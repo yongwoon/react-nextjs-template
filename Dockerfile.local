@@ -15,8 +15,16 @@ WORKDIR $APP_ROOT
 
 COPY ./package.json $APP_ROOT
 COPY ./package-lock.json $APP_ROOT
-RUN npm install
+
+COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./ 2>/dev/null || true
+
+RUN \
+  if [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm install; \
+  elif [ -f yarn.lock ]; then yarn install; \
+  else npm install; \
+  fi
+
 
 COPY . $APP_ROOT
 
-# CMD [ "npm", "run", "dev" ]
+CMD [ "pnpm", "dev" ]
